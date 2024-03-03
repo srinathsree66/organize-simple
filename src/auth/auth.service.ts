@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ApiKey } from 'src/database/entities/apiKey-entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  validateApiKey(apiKey: string): boolean {
-    const validApiList = ['12345', '54321'];
-
-    return validApiList.includes(apiKey);
+  constructor(
+    @InjectRepository(ApiKey) private apiKeyRepository: Repository<ApiKey>,
+  ) {}
+  async validateApiKey(apiKey: string) {
+    const apiKeyExists = await this.apiKeyRepository.findOneBy({ id: apiKey });
+    console.log('Apikey exists', !!apiKeyExists);
+    return !!apiKeyExists;
   }
 }
